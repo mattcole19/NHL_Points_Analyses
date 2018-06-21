@@ -6,7 +6,7 @@ import numpy as np
 in year-month-day format '''
 def get_dates():
     dates = []
-    dates.append('20171004')
+    dates = ['20171004']
     return dates
 
 '''Creates and returns array of all game IDS from the regular season
@@ -42,7 +42,7 @@ def get_teams(soup):
 parameters:
     team - team name'''
 def initialize_array(team):
-    new_array = [team, 0, 0, 0, 0, 0, 0, 0]
+    new_array = [team, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     return new_array
 
 '''Finds and returns score of game
@@ -74,13 +74,37 @@ def search(data, home_team, away_team):
         if (home_index != -1) and (away_index != -1):
             return home_index, away_index
 
+'''Searches for shots in game and returns them as home and away shots
+parameters:
+    soup'''
+def get_shots(soup):
+    shots_list= []
+    for num_shots in soup.find_all('div', class_='BarLine__Stat'):
+        shots_list.append(num_shots.text)
+    home_shots = int(shots_list[0])
+    away_shots = int(shots_list[1])
+    return home_shots, away_shots
+
+'''Searches for hits in game and returns them as home and away hits
+parameters:
+    soup'''
+def get_hits(soup):
+    hits_list= []
+    for num_hits in soup.find_all('div', class_='BarLine__Stat'):
+        hits_list.append(num_hits.text)
+    home_hits = int(hits_list[2])
+    away_hits = int(hits_list[3])
+    return home_hits, away_hits
+
 '''Main function'''
 def main():
     dates = get_dates()
     ids = gather_ids(dates)
     #arrays that will be created
     data = []
-    header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF', 'GA']
+    '''header = team name, games played, wins, losses, overtime losses, points, goals for, 
+    goals against, shots for, shots against, hits for, hits against'''
+    header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF', 'GA', 'SF', 'SA', 'HF', 'HA']
     data.append(header)
     print("PLEASE WAIT WHILE STATS ARE GATHERED")
     print('-------------------------------------')
@@ -107,7 +131,7 @@ def main():
         data[home_index][1] +=1
         data[away_index][1] +=1
 
-        #wins and losses
+        #wins, losses, OT losses
         if home_goals > away_goals:
             data[home_index][2] += 1
             data[away_index][3] += 1
@@ -123,10 +147,22 @@ def main():
         data[home_index][7] += away_goals
         data[away_index][7] += home_goals
 
+        #shots for, shots against
+        home_shots, away_shots = get_shots(soup)
+        data[home_index][8] += home_shots
+        data[home_index][9] += away_shots
+        data[away_index][8] += away_shots
+        data[away_index][9] += home_shots
+
+        #hits
+        home_hits, away_hits = get_hits(soup)
+        data[home_index][10] += home_hits
+        data[home_index][11] += away_hits
+        data[away_index][10] += away_hits
+        data[away_index][11] += home_hits
+
     for row in data:
         print(row)
-
-
 
 
 
