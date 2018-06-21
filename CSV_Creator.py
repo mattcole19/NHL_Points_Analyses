@@ -52,8 +52,8 @@ def get_score(soup):
     score = []
     for goals in soup.find_all('div', class_='Gamestrip__Score'):
         score.append(goals.text)
-    home_goals = score[0]
-    away_goals = score[1]
+    home_goals = int(score[0])
+    away_goals = int(score[1])
     return home_goals, away_goals
 
 '''Searches for row in data that corresponds to the desired team and returns the index
@@ -80,7 +80,7 @@ def main():
     ids = gather_ids(dates)
     #arrays that will be created
     data = []
-    header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF/GP', 'GA/GP']
+    header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF', 'GA']
     data.append(header)
     print("PLEASE WAIT WHILE STATS ARE GATHERED")
     print('-------------------------------------')
@@ -100,9 +100,32 @@ def main():
             data.append(initialize_array(away_team))
             teams.append(away_team)
         home_index, away_index = search(data, home_team, away_team)
+
         home_goals, away_goals = get_score(soup)
 
-    #find row in data where team name row[0] == home_team
+        #games played
+        data[home_index][1] +=1
+        data[away_index][1] +=1
+
+        #wins and losses
+        if home_goals > away_goals:
+            data[home_index][2] += 1
+            data[away_index][3] += 1
+        else:
+            data[away_index][2] += 1
+            data[home_index][3] += 1
+
+        #goals for
+        data[home_index][6] += home_goals
+        data[away_index][6] += away_goals
+
+        #goals against
+        data[home_index][7] += away_goals
+        data[away_index][7] += home_goals
+
+    for row in data:
+        print(row)
+
 
 
 
