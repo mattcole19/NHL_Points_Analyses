@@ -9,7 +9,6 @@ def get_dates():
     dates.append('20171004')
     return dates
 
-
 '''Creates and returns array of all game IDS from the regular season
 parameters:
     days - every day regular season NHL games are played'''
@@ -39,6 +38,13 @@ def get_teams(soup):
     away = another_separation[0]
     return home, away
 
+''' initializes an array for team following header format
+parameters:
+    team - team name'''
+def initialize_array(team):
+    new_array = [team, 0, 0, 0, 0, 0, 0, 0]
+    return new_array
+
 '''Finds and returns score of game
 parameters:
     soup'''
@@ -50,6 +56,25 @@ def get_score(soup):
     away_goals = score[1]
     return home_goals, away_goals
 
+'''Searches for row in data that corresponds to the desired team and returns the index
+parameters:
+    data - data being collected
+    home_team - home team name
+    away_team - away team name'''
+def search(data, home_team, away_team):
+    home_index = -1
+    away_index = -1
+    index = 0
+    for row in data:
+        if row[0] == home_team:
+            home_index = index
+        if row[0] == away_team:
+            away_index = index
+        index +=1
+        if (home_index != -1) and (away_index != -1):
+            return home_index, away_index
+
+'''Main function'''
 def main():
     dates = get_dates()
     ids = gather_ids(dates)
@@ -69,10 +94,16 @@ def main():
         print(link)
         home_team, away_team = get_teams(soup)
         if home_team not in teams:
+            data.append(initialize_array(home_team))
             teams.append(home_team)
         if away_team not in teams:
+            data.append(initialize_array(away_team))
             teams.append(away_team)
+        home_index, away_index = search(data, home_team, away_team)
         home_goals, away_goals = get_score(soup)
+
+    #find row in data where team name row[0] == home_team
+
 
 
 
