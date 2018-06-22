@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
-import numpy as np
-
+import time
 '''Creates and returns array of all dates that regular season games were played 
 in year-month-day format '''
 def get_dates():
@@ -98,6 +97,7 @@ def get_hits(soup):
 
 '''Main function'''
 def main():
+    start_time =time.time()
     dates = get_dates()
     ids = gather_ids(dates)
     #arrays that will be created
@@ -132,12 +132,19 @@ def main():
         data[away_index][1] +=1
 
         #wins, losses, OT losses
+        game_type_title = soup.find('div', class_='ScoreCell__Time').text
         if home_goals > away_goals:
             data[home_index][2] += 1
-            data[away_index][3] += 1
+            if game_type_title == 'Final':
+                data[away_index][3] += 1
+            else:
+                data[away_index][4] +=1
         else:
             data[away_index][2] += 1
-            data[home_index][3] += 1
+            if game_type_title == 'Final':
+                data[home_index][3] += 1
+            else:
+                data[home_index][4] +=1
 
         #goals for
         data[home_index][6] += home_goals
@@ -163,8 +170,9 @@ def main():
 
     for row in data:
         print(row)
-
-
+    print('-------------------------------------')
+    print('PROGRAM COMPLETE')
+    print('My program took', time.time() - start_time,'seconds to run')
 
 if __name__ == '__main__':
     main()
