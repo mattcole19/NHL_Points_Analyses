@@ -1,12 +1,37 @@
 from bs4 import BeautifulSoup
 import requests
 import time
+import pandas as pd
 '''Creates and returns array of all dates that regular season games were played 
 in year-month-day format '''
 def get_dates():
-    dates = []
-    dates = ['20171004']
+    oct = month_day_creator('201710', ['29', '30', '31'])
+    oct.remove('20171001')
+    nov = month_day_creator('201711', ['29', '30'])
+    dec = month_day_creator('201712', ['29', '30', '31'])
+    jan = month_day_creator('201801', ['29', '30', '31'])
+    jan.remove('20180126')
+    jan.remove('20180127')
+    jan.remove('20180128')
+    jan.remove('20180129')
+    jan.remove('20180130')
+    #dates = oct + nov + dec +jan +feb
+    dates = oct
     return dates
+
+'''Creates list of days for each month in year-month day format.  For example: Oct. 9, 2017 is '20171009'
+ parameters:
+    year_month - string of numerical value for respective month and year.  For example: Dec 2017 is '201712 
+    end_days - days of month after the 28th. For example: October has 31 days so it would be ['29','30','31']'''
+def month_day_creator(year_month, end_days):
+    month_days = []
+    days =['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15',
+                     '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28']
+    for day in days:
+        month_days.append(year_month + day)
+    for day in end_days:
+        month_days.append(year_month + day)
+    return month_days
 
 '''Creates and returns array of all game IDS from the regular season
 parameters:
@@ -95,6 +120,17 @@ def get_hits(soup):
     away_hits = int(hits_list[3])
     return home_hits, away_hits
 
+'''Calculates appropriate amount of points a team earned throughout the season
+parameters:
+    data = data set'''
+def calc_points(data):
+    for row in data:
+        if row[0] != 'TEAM':
+            points = 2*row[2] + 1*row[4]
+            row[5] = points
+    return data
+
+
 '''Main function'''
 def main():
     start_time =time.time()
@@ -168,8 +204,9 @@ def main():
         data[away_index][10] += away_hits
         data[away_index][11] += home_hits
 
-    for row in data:
-        print(row)
+    complete_data = calc_points(data)
+    df = pd.DataFrame.from_records(complete_data)
+    print(df)
     print('-------------------------------------')
     print('PROGRAM COMPLETE')
     print('My program took', time.time() - start_time,'seconds to run')
