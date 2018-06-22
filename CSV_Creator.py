@@ -15,8 +15,11 @@ def get_dates():
     jan.remove('20180128')
     jan.remove('20180129')
     jan.remove('20180130')
-    #dates = oct + nov + dec +jan +feb
-    dates = oct
+    feb = month_day_creator('201802', [])
+    mar = month_day_creator('201803', ['29', '30', '31'])
+    apr = ['20180401', '20180402', '20180403', '20180404', '20180405', '20180406', '20180407', '20180408']
+    #dates = oct + nov + dec + jan + feb + mar + apr
+    dates = apr
     return dates
 
 '''Creates list of days for each month in year-month day format.  For example: Oct. 9, 2017 is '20171009'
@@ -135,6 +138,7 @@ def calc_points(data):
 def main():
     start_time =time.time()
     dates = get_dates()
+    print('GATHERING GAME IDS')
     ids = gather_ids(dates)
     #arrays that will be created
     data = []
@@ -143,15 +147,18 @@ def main():
     header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF', 'GA', 'SF', 'SA', 'HF', 'HA']
     data.append(header)
     print("PLEASE WAIT WHILE STATS ARE GATHERED")
-    print('-------------------------------------')
+    print('-----------------------------------------------------------------------')
     teams = []
+    invalid_ids = []
     for id in ids:
-        print(id)
         #sets link to team stats page
         link = 'http://www.espn.com/nhl/matchup/_/gameId/' + id
         url = requests.get(link).text
         soup = BeautifulSoup(url, 'html.parser')
-        print(link)
+        website_title = soup.find('title').text
+        if 'vs' not in website_title:
+            invalid_ids.append(id)
+            continue
         home_team, away_team = get_teams(soup)
         if home_team not in teams:
             data.append(initialize_array(home_team))
@@ -207,7 +214,8 @@ def main():
     complete_data = calc_points(data)
     df = pd.DataFrame.from_records(complete_data)
     print(df)
-    print('-------------------------------------')
+    print('-----------------------------------------------------------------------')
+    print("Games missing:", invalid_ids)
     print('PROGRAM COMPLETE')
     print('My program took', time.time() - start_time,'seconds to run')
 
