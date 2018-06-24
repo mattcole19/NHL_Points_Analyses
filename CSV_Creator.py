@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import pandas as pd
+import csv
+
 '''Creates and returns array of all dates that regular season games were played 
 in year-month-day format '''
 def get_dates():
@@ -18,8 +20,8 @@ def get_dates():
     feb = month_day_creator('201802', [])
     mar = month_day_creator('201803', ['29', '30', '31'])
     apr = ['20180401', '20180402', '20180403', '20180404', '20180405', '20180406', '20180407', '20180408']
-    #dates = oct + nov + dec + jan + feb + mar + apr
-    dates = apr
+    dates = oct + nov + dec + jan + feb + mar + apr
+    #dates = apr
     return dates
 
 '''Creates list of days for each month in year-month day format.  For example: Oct. 9, 2017 is '20171009'
@@ -132,6 +134,13 @@ def calc_points(data):
             points = 2*row[2] + 1*row[4]
             row[5] = points
     return data
+'''Creates csv file from data
+parameters:
+    data = data set'''
+def create_csv(data):
+    with open('nhl_data.csv', 'w') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
 
 
 '''Main function'''
@@ -213,11 +222,13 @@ def main():
 
     complete_data = calc_points(data)
     df = pd.DataFrame.from_records(complete_data)
+    create_csv(complete_data)
     print(df)
     print('-----------------------------------------------------------------------')
     print("Games missing:", invalid_ids)
     print('PROGRAM COMPLETE')
     print('My program took', time.time() - start_time,'seconds to run')
+
 
 if __name__ == '__main__':
     main()
