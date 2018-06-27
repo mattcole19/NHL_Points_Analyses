@@ -3,18 +3,15 @@ from tkinter import ttk
 import pandas as pd
 import pandastable as table
 import numpy as np
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-#asdafaf
-print()
 
 class App():
 
     def __init__(self, master):
         frame = ttk.Frame(master)
-        self.values = ['a', 'b', 'c']
+        self.values = ['POINTS', 'W', 'GF']
 
         #x axis dropdown
         self.x = StringVar()
@@ -33,26 +30,36 @@ class App():
         self.enter.pack()
         self.enter.config(command= self.create_graph)
 
-        fig = Figure()
-        ax = fig.add_subplot(111)
-
         frame.pack()
 
     #creates and shows graph when 'enter' is pressed
     def create_graph(self):
+        #dataframe
+        df = pd.read_csv('nhl_data.csv')
+
+        #get axes
         x_axis = self.x.get()
         y_axis = self.y.get()
 
+        #creates scatter plot
+        scatter = df.plot.scatter(x= x_axis, y= y_axis , s= 50, c= 'DarkBlue')
+        plt.show()
+
+        #create figure for graph
+        fig = Figure()
+        ax = fig.add_subplot(111)
 
 
 
 
-#creates dataframe from csv file
-df = pd.read_csv('nhl_data.csv')
-print(df)
 
 
-#create app and run it
-root = Tk()
-app = App(root)
-root.mainloop()
+
+def main():
+    # create app and run it
+    root = Tk()
+    app = App(root)
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()
