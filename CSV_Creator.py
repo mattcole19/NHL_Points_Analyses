@@ -16,12 +16,11 @@ def get_dates():
     jan.remove('20180127')
     jan.remove('20180128')
     jan.remove('20180129')
-    jan.remove('20180130')
     feb = month_day_creator('201802', [])
     mar = month_day_creator('201803', ['29', '30', '31'])
     apr = ['20180401', '20180402', '20180403', '20180404', '20180405', '20180406', '20180407', '20180408']
-    dates = oct + nov + dec + jan + feb + mar + apr
-    #dates = apr
+    #dates = oct + nov + dec + jan + feb + mar + apr
+    dates = ['20171010']
     return dates
 
 '''Creates list of days for each month in year-month day format.  For example: Oct. 9, 2017 is '20171009'
@@ -56,16 +55,24 @@ def gather_ids(days):
                     game_ids.append(game_id)
     return game_ids
 
-'''From the boxcore link title, this function determines the matchup and returns both teams
+'''From the boxcore link title, this function determines the matchup and returns both teams as their abbreviation
 parameters:
     soup'''
 def get_teams(soup):
+    abbreviations = {
+    'Ducks':'ANA','Bruins':'BOS','Buffalo':'BUF','Flames':'CLG','Hurricanes':'CAR','Blackhawks':'CHI','Avalance':'COL','Blue Jackets':'CBJ','Stars':'DAL','Red Wings':'DET','Oilers':'EDM',
+    'Panthers':'FLA','Kings':'LAK','Wild':'MIN','Canadiens':'MTL','Predators':'NSH','Devils':'NJD','Islanders':'NYI','Rangers':'NYR','Senators':'OTT','Flyers':'PHI','Coyotes':'ARI',
+    'Penguins':'PIT','Blues':'STL','Sharks':'SJS','Lightning':'TBL','Toronto':'TOR','Canucks':'VAN','Golden Knights':'VGK','Capitals':'WSH','Jets':'WNP'
+    }
     website_title = soup.find('title').text
     title_separated = website_title.split(' vs. ')
     home = title_separated[0]
     another_separation = title_separated[1].split(' - ')
     away = another_separation[0]
-    return home, away
+    #switches name to appropriate abbreviation
+    home_team = abbreviations[home]
+    away_team = abbreviations[away]
+    return home_team, away_team
 
 ''' initializes an array for team following header format
 parameters:
@@ -159,6 +166,7 @@ def main():
     print('-----------------------------------------------------------------------')
     teams = []
     invalid_ids = []
+    ids.sort()
     for id in ids:
         #sets link to team stats page
         link = 'http://www.espn.com/nhl/matchup/_/gameId/' + id
@@ -218,6 +226,7 @@ def main():
         data[home_index][10] += home_hits
         data[home_index][11] += away_hits
         data[away_index][10] += away_hits
+
         data[away_index][11] += home_hits
 
     complete_data = calc_points(data)
