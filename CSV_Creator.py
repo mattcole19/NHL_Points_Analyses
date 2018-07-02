@@ -20,7 +20,7 @@ def get_dates():
     mar = month_day_creator('201803', ['29', '30', '31'])
     apr = ['20180401', '20180402', '20180403', '20180404', '20180405', '20180406', '20180407', '20180408']
     #dates = oct + nov + dec + jan + feb + mar + apr
-    dates = ['20171010']
+    dates = apr
     return dates
 
 '''Creates list of days for each month in year-month day format.  For example: Oct. 9, 2017 is '20171009'
@@ -60,9 +60,9 @@ parameters:
     soup'''
 def get_teams(soup):
     abbreviations = {
-    'Ducks':'ANA','Bruins':'BOS','Buffalo':'BUF','Flames':'CLG','Hurricanes':'CAR','Blackhawks':'CHI','Avalance':'COL','Blue Jackets':'CBJ','Stars':'DAL','Red Wings':'DET','Oilers':'EDM',
+    'Ducks':'ANA','Bruins':'BOS','Sabres':'BUF','Flames':'CLG','Hurricanes':'CAR','Blackhawks':'CHI','Avalanche':'COL','Blue Jackets':'CBJ','Stars':'DAL','Red Wings':'DET','Oilers':'EDM',
     'Panthers':'FLA','Kings':'LAK','Wild':'MIN','Canadiens':'MTL','Predators':'NSH','Devils':'NJD','Islanders':'NYI','Rangers':'NYR','Senators':'OTT','Flyers':'PHI','Coyotes':'ARI',
-    'Penguins':'PIT','Blues':'STL','Sharks':'SJS','Lightning':'TBL','Toronto':'TOR','Canucks':'VAN','Golden Knights':'VGK','Capitals':'WSH','Jets':'WNP'
+    'Penguins':'PIT','Blues':'STL','Sharks':'SJS','Lightning':'TBL','Maple Leafs':'TOR','Canucks':'VAN','Golden Knights':'VGK','Capitals':'WSH','Jets':'WNP'
     }
     website_title = soup.find('title').text
     title_separated = website_title.split(' vs. ')
@@ -98,8 +98,8 @@ parameters:
     home_team - home team name
     away_team - away team name'''
 def search(data, home_team, away_team):
-    home_index = -1
-    away_index = -1
+    home_index = None
+    away_index = None
     index = 0
     for row in data:
         if row[0] == home_team:
@@ -107,7 +107,7 @@ def search(data, home_team, away_team):
         if row[0] == away_team:
             away_index = index
         index +=1
-        if (home_index != -1) and (away_index != -1):
+        if (home_index != None) and (away_index != None):
             return home_index, away_index
 
 '''Searches for shots in game and returns them as home and away shots
@@ -154,15 +154,17 @@ def create_csv(data):
 def main():
     start_time =time.time()
     dates = get_dates()
-    print('GATHERING GAME IDS')
+    print('GATHERING GAME IDS...')
     ids = gather_ids(dates)
+    print('GAME IDS OBTAINED SUCCESSFULLY')
+    print()
     #arrays that will be created
     data = []
     '''header = team name, games played, wins, losses, overtime losses, points, goals for, 
     goals against, shots for, shots against, hits for, hits against'''
     header = ['TEAM', 'GP', 'W', 'L', 'OTL', 'POINTS', 'GF', 'GA', 'SF', 'SA', 'HF', 'HA']
     data.append(header)
-    print("PLEASE WAIT WHILE STATS ARE GATHERED")
+    print("PLEASE WAIT WHILE STATS ARE GATHERED...")
     print('-----------------------------------------------------------------------')
     teams = []
     invalid_ids = []
@@ -226,17 +228,19 @@ def main():
         data[home_index][10] += home_hits
         data[home_index][11] += away_hits
         data[away_index][10] += away_hits
-
         data[away_index][11] += home_hits
 
     complete_data = calc_points(data)
     df = pd.DataFrame.from_records(complete_data)
     create_csv(complete_data)
+
     print(df)
     print('-----------------------------------------------------------------------')
     print("Games missing:", invalid_ids)
+    print()
     print('PROGRAM COMPLETE')
-    print('My program took', time.time() - start_time,'seconds to run')
+    time_taken = time.time() - start_time
+    print('Program took {0:.2f} seconds to run'.format(time_taken))
 
 
 if __name__ == '__main__':
