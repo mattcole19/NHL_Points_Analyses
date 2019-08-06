@@ -1,11 +1,12 @@
 # NHL Points Analyses
 
 ## Overview
-
-## Disclaimer
-This was one my first ever personal coding projects, so the code is fairly messy. I was just using it to learn pandas and webscraping
+This project scrapes all NHL games for the 2017-2018 season and generates a dataframe identical to the one on the standings page on NHL.com
 
 
 ## What I Learned
+- Pandas - This was my first time using Pandas so it allowed me to touch the surface on the capabilities of manipulating data with Pyhon
+- Web Scraping - BeautfiulSoup4 also taught me a little bit about HTML along the way
 
-I used this project to gain experience with pandas and the main Python webscraping modules beautifulsoup4 and requests.  The script scrapes every NHL game from the 2017-2018 season and creates a dataframe consisting of team statistics.
+#### Disclaimer
+This was one my first ever personal coding projects, so the code is fairly messy. I was just using it to learn pandas and webscraping
